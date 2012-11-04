@@ -41,25 +41,25 @@ class filterKalman(object):
 			self.P = np.matrix(covariance)
 		self.E = np.matrix(np.diag(np.ones(N)))
 
+	def setOptimalKalmanGain(self, optimal):
+		self.optimal = optimal
+
+	def setObservation(self, observation):
+		self.z = observation
+
 	def __predict(self):
 		self.x = self.F * self.x + self.G * self.u
 		self.P = self.F * self.P * self.F.T + self.Q
-
-	def setOptimalKalmanGain(self, optimal):
-		self.optimal = optimal
 
 	def __update(self):
 		K = self.P * self.H.T * (self.H * self.P * self.H.T + self.R).I
 		e = self.z - self.H * self.x
 		self.x = self.x + K * e
+		KH = self.E - K * self.H
 		if self.optimal == True:
-			self.P = (self.E - K * self.H) * self.P
+			self.P = KH * self.P
 		else:
-			KH = self.E - K * self.H
 			self.P = KH * self.P * KH.T + K * self.R * K.T
-
-	def setObservation(self, observation):
-		self.z = observation
 
 	def advance(self, observation):
 		self.z = observation 
@@ -74,8 +74,8 @@ if __name__ == '__main__':
 	x0 = 0 # m
 	v0 = 20 # m s-1
 	a0 = 2 # m s-2
-	sx = 5 # m s-1
-	sxm = 4 # m s-1
+	sx = 2 # m s-1
+	sxm = 5 # m s-1
 	sv = 1 # m s-2
 	sa = 0.1 # m s-1
 	dt = 0.1 # s
