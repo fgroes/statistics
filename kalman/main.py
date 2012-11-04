@@ -74,20 +74,20 @@ if __name__ == '__main__':
 	x0 = 0 # m
 	v0 = 20 # m s-1
 	a0 = 2 # m s-2
-	sx = 2 # m s-1
-	sxm = 5 # m s-1
+	sx = 1 # m s-1
+	sxm = 20 # m s-1
 	sv = 1 # m s-2
 	sa = 0.1 # m s-1
 	dt = 0.1 # s
 	Nm = 100
 	kalman = filterKalman()
-	kalman.setModelStateTransition([[1, dt], [0, dt]])
+	kalman.setModelStateTransition([[1, dt], [0, 1]])
 	kalman.setModelControlInput([[dt ** 2 / 2], [dt]])
 	kalman.setParameterControlInput(a0)
-	kalman.setNoiseProcess(sa * np.array([[dt ** 4 / 4, dt ** 3 / 2], [dt ** 3 / 2, dt ** 2]]))
+	kalman.setNoiseProcess(sa ** 2 * np.array([[dt ** 4 / 4, dt ** 3 / 2], [dt ** 3 / 2, dt ** 2]]))
 	kalman.setModelObservation([1, 0])
-	kalman.setNoiseObservation([sxm])
-	kalman.setState([[x0], [v0]], [[sx, 0], [0, sv]])
+	kalman.setNoiseObservation([sxm ** 2])
+	kalman.setState([[x0], [v0]], [[sx ** 2, 0], [0, sv ** 2]])
 	ex = np.random.normal(0, sxm, Nm)
 	z = np.array([x0 + v0 * (i + 1) * dt + a0 * ((i + 1) * dt) ** 2 / 2 + ex[i] for i in range(Nm)])
 	ax = initPlot(Nm)
